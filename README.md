@@ -13,14 +13,24 @@
 * POST `/api/atoms/execute` to execute a thing.
 ```json
 {
-	"binary": "Y29uc29sZS5sb2coImhlbGxvIG5lcmQiKQ==",
-	"name": "test.js",
-	"command": ["node", "{path}/test.js"],
-	"atom": "atom-runner",
+	"binaries": [
+		{
+			"name": "exec.sh", 
+			"data": "....", "resolve": true
+		},
+		{
+			"name": "test.cs", "data": "..."
+		}
+	],
+	"command": ["sh", "{path}/exec.sh"],
+	"atom": "atom-mono",
 	"timeout": "20s"
 }
 ```
-* `binary`: is the base64 encoded source file
+* `binaries`: the array of files to send to the sandbox
+    * `name`: name of the file
+    * `data`: base64 encoded contents
+    * `resolve`: change replace all instances of `{path}` in the data
 * `name`: binary destination filename
 * `command`: command to run inside of the atom
 * `atom`: name of the atom
