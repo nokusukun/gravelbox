@@ -42,7 +42,7 @@ func BuildAtom(name string) (string, error) {
 	x, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Debug(cmd.Args)
-		log.Errorf("Failed to run command: ", err)
+		log.Errorf("Failed to run command: %v\n%v", err, strings.TrimSpace(string(x)))
 		return "", err
 	}
 
