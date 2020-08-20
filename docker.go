@@ -89,13 +89,24 @@ func ListAtoms() ([]Atom, error) {
 	return atoms, nil
 }
 
-type Executor struct {
-	Binary string `json:"binary" binding:"required"`
-	Name   string `json:"name" binding:"required"`
+type Binary struct {
+	// Base64 encoded data
+	Data string `json:"data" binding:"required"`
+	// Name of the fine
+	Name string `json:"name" binding:"required"`
+	// Resolve the {path} inside of the code
+	Resolve bool `json:"resolve"`
+}
 
+type Executor struct {
+	// Files to send to the sandbox
+	Binaries []Binary `json:"binaries"`
+
+	// Entry point
 	Command []string `json:"command" binding:"required"`
-	Timeout string   `json:"timeout" binding:"required"`
-	Atom    string   `json:"atom" binding:"required"`
+	// Script execution timeout
+	Timeout string `json:"timeout" binding:"required"`
+	Atom    string `json:"atom" binding:"required"`
 }
 
 func (e Executor) Start() (string, error) {
@@ -104,12 +115,6 @@ func (e Executor) Start() (string, error) {
 	timeout, err := time.ParseDuration(e.Timeout)
 	if err != nil {
 		return "", fmt.Errorf("%v is not a valid timeout duration", e.Timeout)
-	}
-
-	// Save to payload
-	binary, err := base64.StdEncoding.DecodeString(e.Binary)
-	if err != nil {
-		return "", fmt.Errorf("cannot parse binary: %v", err)
 	}
 
 	// Sandbox path
@@ -126,10 +131,25 @@ func (e Executor) Start() (string, error) {
 		return "", fmt.Errorf("failed to create sandbox directory '%v': %v", sbxpath, err)
 	}
 
-	binaryPath := path.Join(sbxpath, e.Name)
-	err = ioutil.WriteFile(binaryPath, binary, os.ModePerm)
-	if err != nil {
-		return "", fmt.Errorf("failed to write binary: %v", err)
+	for _, b := range e.Binaries {
+		// Save to payload
+		binary, err := base64.StdEncoding.DecodeString(b.Data)
+		if err != nil {
+			return "", fmt.Errorf("cannot parse binary: %v", err)
+		}
+
+		if b.Resolve {
+			binary = []byte(stemp.Compile(string(binary), map[string]interface{}{
+				"path": fmt.Sprintf("/mnt/%v", sbxfolder),
+			}))
+		}
+
+		binaryPath := path.Join(sbxpath, b.Name)
+		err = ioutil.WriteFile(binaryPath, binary, os.ModePerm)
+		if err != nil {
+			return "", fmt.Errorf("failed to write binary: %v", err)
+		}
+
 	}
 
 	// docker run --rm --network none -it -v absolute_path:/mnt atom-2 python3 /mnt/sample.py
