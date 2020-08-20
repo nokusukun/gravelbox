@@ -14,13 +14,12 @@ import (
 	"time"
 )
 
-
 func GetDockerVersion() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), CommandTimeout)
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, cfgDocker.Key("command").String(), "--version")
-	x , err := cmd.CombinedOutput()
+	x, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", err
 	}
@@ -40,7 +39,7 @@ func BuildAtom(name string) (string, error) {
 		cfgDocker.Key("command").String(), "build",
 		"--tag", atomName,
 		atomSource)
-	x , err := cmd.CombinedOutput()
+	x, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Debug(cmd.Args)
 		log.Errorf("Failed to run command: ", err)
@@ -53,11 +52,12 @@ func BuildAtom(name string) (string, error) {
 
 type Atom struct {
 	Repository string `json:"repository"`
-	Tag string `json:"tag"`
-	ImageID string `json:"image_id"`
-	Created string `json:"created"`
-	Size string `json:"size"`
+	Tag        string `json:"tag"`
+	ImageID    string `json:"image_id"`
+	Created    string `json:"created"`
+	Size       string `json:"size"`
 }
+
 func ListAtoms() ([]Atom, error) {
 	// docker images --filter "label=source=gravelbox"
 	ctx, cancel := context.WithTimeout(context.Background(), CommandTimeout)
@@ -67,7 +67,7 @@ func ListAtoms() ([]Atom, error) {
 		cfgDocker.Key("command").String(), "images",
 		"--filter", "label=source=gravelbox",
 		"--format", "{{.Repository}}@@{{.Tag}}@@{{.ID}}@@{{.CreatedAt}}@@{{.Size}}")
-	x , err := cmd.CombinedOutput()
+	x, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Debug(cmd.Args)
 		log.Errorf("Failed to run command: ", err)
@@ -91,11 +91,11 @@ func ListAtoms() ([]Atom, error) {
 
 type Executor struct {
 	Binary string `json:"binary" binding:"required"`
-	Name string `json:"name" binding:"required"`
+	Name   string `json:"name" binding:"required"`
 
 	Command []string `json:"command" binding:"required"`
-	Timeout string `json:"timeout" binding:"required"`
-	Atom string `json:"atom" binding:"required"`
+	Timeout string   `json:"timeout" binding:"required"`
+	Atom    string   `json:"atom" binding:"required"`
 }
 
 func (e Executor) Start() (string, error) {
@@ -158,14 +158,14 @@ func (e Executor) Start() (string, error) {
 	log.Verbose("Executing command", arguments)
 
 	cmd := exec.CommandContext(ctx, cfgDocker.Key("command").String(), arguments...)
-	x , err := cmd.CombinedOutput()
+	x, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Debug(cmd.Args, ctx.Err())
 		switch ctx.Err() {
 		case context.DeadlineExceeded:
 			return "", fmt.Errorf("script execution timeout")
 		}
-		return "", err
+		return strings.TrimSpace(string(x)), err
 	}
 
 	return strings.TrimSpace(string(x)), nil

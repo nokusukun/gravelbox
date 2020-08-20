@@ -76,6 +76,25 @@ func main() {
 				return
 			}
 
+			atoms, err := ListAtoms()
+			if err != nil {
+				JSONReturn{
+					Error: fmt.Sprintf("failed retrieving atoms: %v", err),
+				}.Send(g)
+				return
+			}
+
+			hasAtom := false
+			for _, atom := range atoms {
+				if atom.Repository == exec.Atom {
+					hasAtom = true
+				}
+			}
+			if !hasAtom {
+				JSONReturn{Error: fmt.Sprintf("%v does not exist", exec.Atom)}.Send(g)
+				return
+			}
+
 			command, err := exec.Start()
 			JSONReturn{
 				Data:  command,
