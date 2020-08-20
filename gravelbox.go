@@ -68,11 +68,12 @@ func main() {
 			}.Send(g)
 		})
 
-		api.POST("/atoms/execute/:name", func(g *gin.Context) {
+		api.POST("/atoms/execute", func(g *gin.Context) {
 			exec := Executor{}
 			err := g.ShouldBindJSON(&exec)
 			if err != nil {
-				JSONReturn{Error: err}.Send(g); return
+				JSONReturn{Error: err}.Send(g)
+				return
 			}
 
 			command, err := exec.Start()
@@ -88,7 +89,7 @@ func main() {
 }
 
 type JSONReturn struct {
-	Data interface{} `json:"data"`
+	Data  interface{} `json:"data"`
 	Error interface{} `json:"error"`
 
 	code int
