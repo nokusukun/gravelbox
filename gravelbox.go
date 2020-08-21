@@ -97,7 +97,10 @@ func main() {
 
 			command, err := exec.Start()
 			JSONReturn{
-				Data:  command,
+				Data:  gin.H{
+					"output": command,
+					"runtime": exec.RuntineID(),
+				},
 				Error: err,
 			}.Send(g)
 		})

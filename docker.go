@@ -105,11 +105,19 @@ type Executor struct {
 	// Entry point
 	Command []string `json:"command" binding:"required"`
 	// Script execution timeout
-	Timeout string `json:"timeout" binding:"required"`
-	Atom    string `json:"atom" binding:"required"`
+	Timeout  string `json:"timeout" binding:"required"`
+	Atom     string `json:"atom" binding:"required"`
+	Network  bool   `json:"network"`
+	ReadOnly bool   `json:"read_only"`
+
+	sbx string
 }
 
-func (e Executor) Start() (string, error) {
+func (e *Executor) RuntineID() string {
+	return e.sbx
+}
+
+func (e *Executor) Start() (string, error) {
 	mountdir := cfg.Section("gravelbox").Key("mountdir").String()
 
 	timeout, err := time.ParseDuration(e.Timeout)
@@ -124,6 +132,7 @@ func (e Executor) Start() (string, error) {
 	}
 
 	sbxfolder := xid.New().String()
+	e.sbx = sbxfolder
 	mountpath := path.Join(workingpath, mountdir)
 	sbxpath := path.Join(mountpath, sbxfolder)
 	err = os.MkdirAll(sbxpath, os.ModePerm)
@@ -156,13 +165,17 @@ func (e Executor) Start() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	arguments := []string{"run",
-		"--rm",
-		//"--read-only",
-		"--network", "none",
-		"-v", fmt.Sprintf("%v:/mnt", mountpath),
-		e.Atom,
+	arguments := []string{"run", "--rm"}
+	if e.ReadOnly {
+		arguments = append(arguments, "--read-only")
 	}
+	if !e.Network {
+		arguments = append(arguments, "--network", "none")
+	}
+
+	arguments = append(arguments,
+		"-v", fmt.Sprintf("%v:/mnt", mountpath),
+		e.Atom,)
 
 	// replace format strings in command
 	for i := range e.Command {
