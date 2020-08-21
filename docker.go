@@ -90,12 +90,14 @@ func ListAtoms() ([]Atom, error) {
 }
 
 type Binary struct {
-	// Base64 encoded data
+	// data string, when sending payloads, encode to base64 and set the `decode_b64` flag option to true.
 	Data string `json:"data" binding:"required"`
 	// Name of the fine
 	Name string `json:"name" binding:"required"`
 	// Resolve the {path} inside of the code
 	Resolve bool `json:"resolve"`
+	// DecodeB64 treat the string as a base64 string
+	DecodeB64 bool `json:"decode_b64"`
 }
 
 type Executor struct {
@@ -142,9 +144,12 @@ func (e *Executor) Start() (string, error) {
 
 	for _, b := range e.Binaries {
 		// Save to payload
-		binary, err := base64.StdEncoding.DecodeString(b.Data)
-		if err != nil {
-			return "", fmt.Errorf("cannot parse binary: %v", err)
+		binary := []byte(b.Data)
+		if b.DecodeB64 {
+			binary, err = base64.StdEncoding.DecodeString(b.Data)
+			if err != nil {
+				return "", fmt.Errorf("cannot parse binary: %v", err)
+			}
 		}
 
 		if b.Resolve {
@@ -175,7 +180,7 @@ func (e *Executor) Start() (string, error) {
 
 	arguments = append(arguments,
 		"-v", fmt.Sprintf("%v:/mnt", mountpath),
-		e.Atom,)
+		e.Atom)
 
 	// replace format strings in command
 	for i := range e.Command {
