@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9c2af3b6-0702-469c-8a1c-e46660628ee9" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker.go" beforeDir="false" afterPath="$PROJECT_DIR$/docker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +54,9 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="hmmm beans" />
     <MESSAGE value="fix(docker): failed command execution now has more clarity&#10;checks if an atom exists before it tries to execute something" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix(docker): failed command execution now has more clarity&#10;checks if an atom exists before it tries to execute something" />
+    <MESSAGE value="fix(docker): added support for mono/c#&#10;changed schema of the execution payload" />
+    <MESSAGE value="feat(docker): added decode_b64 flag" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat(docker): added decode_b64 flag" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -68,13 +70,13 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="726" y="323" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1597954235723" />
-    <state x="585" y="114" width="1114" height="908" key="CommitChangelistDialog2" timestamp="1597955460628">
+    <state x="585" y="114" width="1114" height="908" key="CommitChangelistDialog2" timestamp="1597981110470">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="585" y="114" width="1114" height="908" key="CommitChangelistDialog2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1597955460628" />
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1597954683339">
+    <state x="585" y="114" width="1114" height="908" key="CommitChangelistDialog2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1597981110470" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2" timestamp="1597957496684">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1597954683339" />
+    <state x="552" y="253" key="Vcs.Push.Dialog.v2/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1597957496684" />
   </component>
 </project>

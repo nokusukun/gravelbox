@@ -16,7 +16,9 @@
 	"binaries": [
 		{
 			"name": "exec.sh", 
-			"data": "....", "resolve": true
+			"data": "....", 
+            "resolve": true,
+            "decode_b64": true
 		},
 		{
 			"name": "test.cs", "data": "..."
@@ -24,14 +26,19 @@
 	],
 	"command": ["sh", "{path}/exec.sh"],
 	"atom": "atom-mono",
-	"timeout": "20s"
+	"timeout": "20s",
+    "network": false,
+    "read_only": true
 }
 ```
 * `binaries`: the array of files to send to the sandbox
     * `name`: name of the file
-    * `data`: base64 encoded contents
+    * `data`: file contents
     * `resolve`: change replace all instances of `{path}` in the data
+    * `decode_b64`: treat the data as a base64 string and decode before saving the binary
 * `name`: binary destination filename
 * `command`: command to run inside of the atom
 * `atom`: name of the atom
 * `timeout`: timeout...?
+* `network`: enable/disable network access (default: false)
+* `read_only`: enable disable writing to the filesystem (write access is required especially in compiled programs) (default: false)
