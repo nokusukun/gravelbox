@@ -4,6 +4,13 @@ Gravelbox is a containerized execution platform with a REST API, it's main funct
 to run unsafe source code (or anything, really) with granular controls such as timeouts and resource
 access.
 
+## Sections
+* [**Setup**](#setup)
+* [**Configuration**](#configuration)
+* [**Usage**](#usage)
+* [**Executor**](#executor)
+* [**Examples**](#examples)
+
 ### Setup
 * Install Docker
 * `git pull github.com/nokusutwo/gravelbox`
