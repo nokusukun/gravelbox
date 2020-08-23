@@ -1,12 +1,36 @@
 # gravelbox
 
+Gravelbox is a containerized execution platform with a REST API, it's main functions is 
+to run unsafe source code (or anything, really) with granular controls such as timeouts and resource
+access.
+
 ### Setup
 * Install Docker
 * `git pull github.com/nokusutwo/gravelbox`
 * `docker build atom\`
 * `go run .`
 
+### Configuration
+There's an included `gravel.ini` with rudimentary configuration options.
+```ini
+[docker]
+# the docker command to use
+command=docker
+# Global docker execution timeout for all docker commands 
+# (this includes when sending a /atom/execute) request
+timeout=120s
+
+[atom]
+# Path to the atom folder
+path=atom
+
+[gravelbox]
+# Mount point to where the files are saved prior to execution
+mountdir=_mount
+```
+
 ### Usage
+See examples below.
 * GET `/api/version` to get the docker version.
 * GET `/api/atoms/create/:name` to create a new atom.
     * *The first atom usually takes forever to create*
@@ -47,8 +71,18 @@
 * `network`: enable/disable network access (default: false)
 * `read_only`: enable disable writing to the filesystem (write access is required especially in compiled programs) (default: false)
 
+### What's the deal with `{path}`?
+Before the container is started, the binaries are saved in a unique folder specified in `gravelbox.mountdir` in `gravel.ini`.
+The folder name is random so gravelbox automatically replaces the instances of `{path}` prior to execution in `$.command` as well in
+the binaries using the `resolve` flag. 
+
+`"command": ["sh", "{path}/exec.sh"]` is automatically resolved to `sh /mnt/12345ABCDE/exec.sh`.
+
+
+
+
 ### Executor
-Atoms now have a built in utility named `executor` this facilitates fine grained program execution within the atom.
+Atoms now have a built in utility named `executor` which facilitates fine grained program execution within the container.
 Executor works by following a `.execute` file. The working path is also changed to where the `.execute` file lives.
 
 Sample `.execute` file
@@ -74,9 +108,12 @@ This example file builds `test.cs` and then runs it with a maximum execution tim
 
 ---
 
-### Sample
+### Examples
 
 This example uses the `executor` utility in order to build the C# source code first.
+The binary includes two files namely `.execute` which is a JSON file and `test.cs` which is a base64 encoded source code.
+
+The atom execution is limited to run for 20s in which the rest endpoint returns with an error if it exceeds past that.
 
 POST `http://localhost:12375/api/atoms/execute`
 ```json
