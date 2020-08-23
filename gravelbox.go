@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-ini/ini"
 	"github.com/nokusukun/roggy"
+	"os"
 	"time"
 )
 
@@ -32,6 +33,12 @@ func init() {
 		//panic("Docker cannot be found or can't be executed through '" + cfgDocker.Key("command").String() + "'")
 	}
 	log.Info("Docker version: ", version)
+	_, err = ListAtoms()
+	if err != nil {
+		log.Errorf("No atom image built, run 'docker build atom/' before starting gravelbox.")
+		roggy.Wait()
+		os.Exit(1)
+	}
 
 	CommandTimeout, err = time.ParseDuration(cfgDocker.Key("timeout").String())
 	if err != nil {
@@ -52,10 +59,15 @@ func main() {
 		})
 
 		api.GET("/atoms/create/:name", func(g *gin.Context) {
-			log.Info("Creating new atom, the first time usually takes a while")
-			command, err := BuildAtom(g.Param("name"))
+			_, err := BuildAtom(g.Param("name"))
 			JSONReturn{
-				Data:  command,
+				Error: err,
+			}.Send(g)
+		})
+
+		api.GET("/atoms/delete/:name", func(g *gin.Context) {
+			err := DeleteAtom(g.Param("name"))
+			JSONReturn{
 				Error: err,
 			}.Send(g)
 		})
@@ -86,7 +98,7 @@ func main() {
 
 			hasAtom := false
 			for _, atom := range atoms {
-				if atom.Repository == exec.Atom {
+				if atom.Name == exec.Atom {
 					hasAtom = true
 				}
 			}
@@ -97,8 +109,8 @@ func main() {
 
 			command, err := exec.Start()
 			JSONReturn{
-				Data:  gin.H{
-					"output": command,
+				Data: gin.H{
+					"output":  command,
 					"runtime": exec.RuntineID(),
 				},
 				Error: err,
