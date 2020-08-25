@@ -32,7 +32,7 @@ func BuildAtom(name string) (string, error) {
 	// docker build --tag atom-2 .
 	// docker image rm atom-marcus
 	atomName := fmt.Sprintf("atom-%v", name)
-	atomSource := path.Join(".", "atom", ".")
+	atomSource := path.Join(".", cfg.Section("atom").Key("path").String(), ".")
 
 	ctx, cancel := context.WithTimeout(context.Background(), CommandTimeout)
 	defer cancel()
@@ -219,11 +219,13 @@ func (e *Executor) Start() (string, error) {
 
 	}
 
+	log.Verbose("Binary Saving: ", time.Now().Sub(start))
+
 	// docker run --rm --network none -it -v absolute_path:/mnt atom-2 python3 /mnt/sample.py
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	arguments := []string{"run", "--rm"}
+	arguments := []string{"run", "--rm", "--name", sbxFolder}
 	if e.ReadOnly {
 		arguments = append(arguments, "--read-only")
 	}
@@ -242,13 +244,17 @@ func (e *Executor) Start() (string, error) {
 
 	arguments = append(arguments, e.Command...)
 	log.Verbose("Executing command", arguments)
-
 	cmd := exec.CommandContext(ctx, cfgDocker.Key("command").String(), arguments...)
+	log.Verbose("Waiting for output: ", time.Now().Sub(start))
 	x, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Debug(cmd.Args, ctx.Err())
 		switch ctx.Err() {
 		case context.DeadlineExceeded:
+			err := KillAtomContainer(sbxFolder)
+			if err != nil {
+				log.Errorf("Failed to force kill a container: %v", err)
+			}
 			return "", fmt.Errorf("script execution timeout")
 		}
 		msg := string(x)
@@ -264,4 +270,19 @@ func (e *Executor) Start() (string, error) {
 	}
 
 	return strings.TrimSpace(string(x)), nil
+}
+
+func KillAtomContainer(name string) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), CommandTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx,
+		cfgDocker.Key("command").String(), "rm", "-f", name)
+	x, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Debug(cmd.Args)
+		log.Errorf("Failed to run command: %v\n%v", err, strings.TrimSpace(string(x)))
+	}
+	return err
 }

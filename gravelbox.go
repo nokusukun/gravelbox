@@ -118,7 +118,7 @@ func main() {
 		})
 	}
 
-	engine.Run("localhost:12375")
+	engine.Run(cfg.Section("gravelbox").Key("api").String())
 	roggy.Wait()
 }
 
