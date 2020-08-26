@@ -57,7 +57,7 @@ See examples below.
 			"name": "test.cs", "data": "..."
 		}
 	],
-	"command": ["sh", "{path}/exec.sh"],
+	"command": ["sh", "exec.sh"],
 	"atom": "mono",
 	"timeout": "20s",
     "network": false,
@@ -145,7 +145,7 @@ POST `http://localhost:12375/api/atoms/execute`
 			"decode_b64": true
 		}
 	],
-	"command": ["executor", "{path}/.execute"],
+	"command": ["executor", ".execute"],
 	"atom": "v2",
 	"timeout": "20s"
 }
@@ -173,7 +173,7 @@ POST `http://localhost:12375/api/atoms/execute`
 			"name": "test.js", "data": "console.log('Hello universe')"
 		}
 	],
-	"command": ["node", "{path}/test.js"],
+	"command": ["node", "test.js"],
 	"atom": "v2",
 	"timeout": "1s"
 }

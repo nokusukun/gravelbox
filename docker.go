@@ -225,7 +225,7 @@ func (e *Executor) Start() (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	arguments := []string{"run", "--rm", "--name", sbxFolder}
+	arguments := []string{"run", "--rm", "--name", sbxFolder, "--workdir", fmt.Sprintf("/mnt/%v", sbxFolder)}
 	if e.ReadOnly {
 		arguments = append(arguments, "--read-only")
 	}
