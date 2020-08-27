@@ -246,6 +246,7 @@ func (e *Executor) Start() (string, error) {
 	log.Verbose("Executing command", arguments)
 	cmd := exec.CommandContext(ctx, cfgDocker.Key("command").String(), arguments...)
 	log.Verbose("Waiting for output: ", time.Now().Sub(start))
+
 	x, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Debug(cmd.Args, ctx.Err())

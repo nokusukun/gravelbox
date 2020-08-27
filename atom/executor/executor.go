@@ -57,7 +57,9 @@ func main() {
 		} else {
 			ctx = context.Background()
 		}
-		fmt.Println("---.executor---")
+		if !executor.NoParse {
+			fmt.Println("---.executor---")
+		}
 		cmd := exec.CommandContext(ctx, command.Command, command.Args...)
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
@@ -82,4 +84,5 @@ type Command struct {
 
 type ExecuteFile struct {
 	Commands []Command `json:"commands"`
+	NoParse  bool      `json:"no_parse"`
 }
