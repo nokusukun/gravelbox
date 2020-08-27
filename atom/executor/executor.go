@@ -44,7 +44,7 @@ func main() {
 			var err error
 			timeout, err = time.ParseDuration(command.Timeout)
 			if err != nil {
-				fmt.Sprintf("Failed to parse timeout duration: %v\n", command.Timeout)
+				fmt.Println(fmt.Sprintf("Failed to parse timeout duration: %v", command.Timeout))
 				os.Exit(1)
 			}
 		}
@@ -57,7 +57,7 @@ func main() {
 		} else {
 			ctx = context.Background()
 		}
-
+		fmt.Println("---.executor---")
 		cmd := exec.CommandContext(ctx, command.Command, command.Args...)
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin

@@ -259,12 +259,6 @@ func (e *Executor) Start() (string, error) {
 		}
 		msg := string(x)
 		log.Debug("Sending more info error")
-		//for _, binary := range e.Binaries {
-		//	if _, errx := base64.StdEncoding.DecodeString(binary.Data.(string)); errx == nil && !binary.DecodeB64 {
-		//		log.Debug(binary.Name, " is detected as b64 but not decoded")
-		//		err = fmt.Errorf("%v: %v", fmt.Sprintf("<suggestion: '%v' is detected as base64 but flag 'decode_b64' is false>", binary.Name), err)
-		//	}
-		//}
 
 		return strings.TrimSpace(msg), err
 	}

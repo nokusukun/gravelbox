@@ -6,6 +6,7 @@ import (
 	"github.com/go-ini/ini"
 	"github.com/nokusukun/roggy"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -107,10 +108,20 @@ func main() {
 				return
 			}
 
-			command, err := exec.Start()
+			var send interface{}
+			send, err = exec.Start()
+			lines := strings.Split(send.(string), "---.executor---\n")
+			if len(lines) > 1 {
+				cleanLines := []string{}
+				for _, line := range lines[1:] {
+					cleanLines = append(cleanLines, strings.TrimSpace(line))
+				}
+				send = cleanLines
+			}
+
 			JSONReturn{
 				Data: gin.H{
-					"output":  command,
+					"output":  send,
 					"runtime": exec.RuntineID(),
 				},
 				Error: err,
