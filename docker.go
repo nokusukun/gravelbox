@@ -251,10 +251,12 @@ func (e *Executor) Start() (string, error) {
 		log.Debug(cmd.Args, ctx.Err())
 		switch ctx.Err() {
 		case context.DeadlineExceeded:
-			err := KillAtomContainer(sbxFolder)
-			if err != nil {
-				log.Errorf("Failed to force kill a container: %v", err)
-			}
+			go func() {
+				err := KillAtomContainer(sbxFolder)
+				if err != nil {
+					log.Errorf("Failed to force kill a container: %v", err)
+				}
+			}()
 			return "", fmt.Errorf("script execution timeout")
 		}
 		msg := string(x)
