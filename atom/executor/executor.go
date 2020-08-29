@@ -64,6 +64,11 @@ func main() {
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
+
+		if command.Env != nil {
+			cmd.Env = append(os.Environ(), command.Env...)
+		}
+
 		err = cmd.Run()
 		if err != nil {
 			switch ctx.Err() {
@@ -80,6 +85,7 @@ type Command struct {
 	Command string   `json:"command"`
 	Args    []string `json:"args"`
 	Timeout string   `json:"timeout"`
+	Env     []string `json:"env"`
 }
 
 type ExecuteFile struct {
