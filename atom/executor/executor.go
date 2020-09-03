@@ -38,6 +38,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	exports := []Export{}
+
 	for _, command := range executor.Commands {
 		var timeout time.Duration
 		if command.Timeout != "" {
@@ -57,27 +59,52 @@ func main() {
 		} else {
 			ctx = context.Background()
 		}
-		if !executor.NoParse {
+		if !executor.NoParse && !executor.ExportJSON {
 			fmt.Println("---.executor---")
 		}
 		cmd := exec.CommandContext(ctx, command.Command, command.Args...)
-		cmd.Stderr = os.Stderr
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
+
+		if !executor.ExportJSON {
+			cmd.Stderr = os.Stderr
+			cmd.Stdin = os.Stdin
+			cmd.Stdout = os.Stdout
+		}
 
 		if command.Env != nil {
 			cmd.Env = append(os.Environ(), command.Env...)
 		}
+		var err error
+		var outputB []byte
+		var output string
 
-		err = cmd.Run()
+		if executor.ExportJSON {
+			outputB, err = cmd.CombinedOutput()
+			output = string(outputB)
+		} else {
+			err = cmd.Run()
+		}
+
 		if err != nil {
 			switch ctx.Err() {
 			case context.DeadlineExceeded:
 				err = fmt.Errorf("script execution timeout")
+				output = fmt.Sprintf("%v (Error: script execution timeout)", output)
 			}
-			fmt.Println(err)
-			os.Exit(1)
+			if !executor.ExportJSON {
+				fmt.Println(err)
+			}
 		}
+		exports = append(exports, Export{
+			Command: command,
+			Output:  output,
+		})
+	}
+	if executor.ExportJSON {
+		out, err := json.Marshal(exports)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("ExecutorJSON:%v", string(out))
 	}
 }
 
@@ -89,6 +116,12 @@ type Command struct {
 }
 
 type ExecuteFile struct {
-	Commands []Command `json:"commands"`
-	NoParse  bool      `json:"no_parse"`
+	Commands   []Command `json:"commands"`
+	NoParse    bool      `json:"no_parse"`
+	ExportJSON bool      `json:"export_json"`
+}
+
+type Export struct {
+	Command Command `json:"command"`
+	Output  string  `json:"output"`
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-ini/ini"
@@ -117,6 +118,9 @@ func main() {
 					cleanLines = append(cleanLines, strings.TrimSpace(line))
 				}
 				send = cleanLines
+			} else if strings.HasPrefix(send.(string), "ExecutorJSON:") {
+				jsonString := send.(string)[13:]
+				err = json.Unmarshal([]byte(jsonString), &send)
 			}
 
 			JSONReturn{
