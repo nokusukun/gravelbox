@@ -110,6 +110,8 @@ Sample `.execute` file
     * *`command`: the main executable
     * `args`: an array of arguments
     * `timeout`: a go `time.Duration` string
+* `no_parse`: Disables the attempt to parse each execution as an array. One output string per command. (default: `false`)
+* `export_json`: Export the parsed output to JSON. (default: `false`)
 
 This example file builds `test.cs` and then runs it with a maximum execution time of `100ms`.
 
