@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -96,7 +97,7 @@ func main() {
 		}
 		exports = append(exports, Export{
 			Command: command,
-			Output:  output,
+			Output:  strings.TrimSpace(output),
 		})
 	}
 	if executor.ExportJSON {
